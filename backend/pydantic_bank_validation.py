@@ -132,7 +132,6 @@ def get_batch_result(failed_records):
     """Determine if batch validation passed (no failed records)."""
     return failed_records == 0
 
-
 def get_batch_summary(valid_records, failed_records, errors):
     """Generate a pre-flight summary of batch validation results."""
     return PreflightSummary(
@@ -142,12 +141,10 @@ def get_batch_summary(valid_records, failed_records, errors):
         failed_records=failed_records,
         batch_result=get_batch_result(failed_records))
 
-
 def split_into_batches(records, batch_size):
     """Yield successive batch_size chunks from records."""
     for start in range(0, len(records), batch_size):
         yield records[start:start + batch_size]
-
 
 def mock_submit_to_paypoint(split_batch):
     """Mock Paypoint submission — replace with real API call."""
@@ -161,12 +158,9 @@ def submit_all_batches(valid_records):
         for split_batch in split_into_batches(valid_records, MAX_PAYPOINT_BATCH_LIMIT)
     ]
 
-
-
 def mock_check_paypoint_status(paypoint_batch_id):
     """Mock Paypoint status check — replace with real API call."""
     return random.choice(["Processed"])  # Always "Processed" since there's no real API yet
-
 
 def check_all_paypoint_statuses(batches):
     """Check every submitted batch and report whether all have been processed."""
@@ -176,7 +170,6 @@ def check_all_paypoint_statuses(batches):
     }
     all_processed = all(status != "Pending" for status in statuses.values())
     return all_processed, statuses
-
 
 def mock_retrieve_paypoint_batch_results(customers):
     """Mock Paypoint result retrieval — replace with real API call."""
