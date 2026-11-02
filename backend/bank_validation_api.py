@@ -1,9 +1,16 @@
 from fastapi import FastAPI, UploadFile, File
 import csv, io
-
+from fastapi.middleware.cors import CORSMiddleware
 from backend.pydantic_bank_validation import validate_csv, validate_records, get_batch_summary
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["POST"],
+    allow_headers=["*"],
+)
 
 @app.get("/health")
 def read_root():
