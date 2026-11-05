@@ -3,6 +3,7 @@ import { useState } from "react";
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [results, setResults] = useState(null);
   function handleFileChange(event) {
     setSelectedFile(event.target.files[0]);
   }
@@ -15,6 +16,7 @@ function App() {
       body: formData,
     });
     const data = await response.json();
+    setResults(data);
     console.log(data);
   }
   return (
@@ -30,10 +32,18 @@ function App() {
         onChange={handleFileChange}
       />
       {selectedFile && <p>{selectedFile.name}</p>}
-
       <button onClick={handleValidate} type="button">
         Validate file
       </button>
+      {results && <p>Total Records: {results.summary.total_records}</p>}
+      {results && <p>Valid Records: {results.summary.valid_records}</p>}
+      {results && <p>Failed Records: {results.summary.failed_records}</p>}
+      {results &&
+        results.validation.errors.map((error) => (
+          <p key={error.row + "-" + error.field}>
+            Row {error.row}: {error.message} {error.field}
+          </p>
+        ))}
     </main>
   );
 }
