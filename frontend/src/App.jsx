@@ -23,7 +23,6 @@ function App() {
     <main>
       <h1>Bank Account Batch Validator</h1>
       <p>Upload a CSV file to check your customer records.</p>
-
       <label htmlFor="csv-file">Choose a CSV file</label>
       <input
         id="csv-file"
@@ -38,10 +37,14 @@ function App() {
       {results && <p>Total Records: {results.summary.total_records}</p>}
       {results && <p>Valid Records: {results.summary.valid_records}</p>}
       {results && <p>Failed Records: {results.summary.failed_records}</p>}
+      {results && results.summary.failed_records === 0 && (
+        <p>No Validation Errors Found</p>
+      )}
       {results &&
         results.validation.errors.map((error) => (
           <p key={error.row + "-" + error.field}>
-            Row {error.row}: {error.message} {error.field}
+            Row {error.row}: {error.field}{" "}
+            {error.message.replace("Value error, ", "")}
           </p>
         ))}
     </main>
