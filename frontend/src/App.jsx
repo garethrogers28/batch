@@ -8,17 +8,22 @@ function App() {
   // tells React to render again; null means there is no file or result yet.
   const [selectedFile, setSelectedFile] = useState(null);
   const [results, setResults] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // React calls this handler when the file input changes.
   function handleFileChange(event) {
     // The input's files list contains the selected files; [0] gets the first.
     setSelectedFile(event.target.files[0]);
+    setResults(null);
   }
 
   // async lets this handler use await while the backend responds.
   async function handleValidate() {
     // Stop immediately if no file is selected.
     if (!selectedFile) return;
+
+    // set loading as true
+    setIsLoading(true);
 
     // FormData holds the file under "file", the field expected by the backend.
     const formData = new FormData();
@@ -34,6 +39,7 @@ function App() {
     // so the next render can display the results.
     const data = await response.json();
     setResults(data);
+    setIsLoading(false);
   }
 
   // JSX describes what React should display. Curly braces embed JavaScript.
@@ -59,6 +65,9 @@ function App() {
       <button disabled={!selectedFile} onClick={handleValidate} type="button">
         Validate file
       </button>
+
+      {/* added loading state*/}
+      {isLoading && <p>Validating...</p>}
 
       {/* Show the backend's summary only once results are available. */}
       {results && <p>Total Records: {results.summary.total_records}</p>}
