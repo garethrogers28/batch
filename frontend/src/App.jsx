@@ -10,6 +10,7 @@ function App() {
   const [results, setResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
+  const [missingFields, setMissingFields] = useState([]);
 
   // React calls this handler when the file input changes.
   function handleFileChange(event) {
@@ -41,6 +42,11 @@ function App() {
       if (!response.ok) throw new Error("Request Failed");
 
       const data = await response.json();
+      if (data.valid === false) {
+        console.log(data.missing_fields);
+        setMissingFields(data.missing_fields);
+        throw new Error();
+      }
       setResults(data);
     } catch (error) {
       setApiError(error);
@@ -78,6 +84,11 @@ function App() {
 
       {/* added loading state*/}
       {isLoading && <p>Validating...</p>}
+
+      {/*display missing headers*/}
+      {missingFields.length > 0 && (
+        <p>Missing Headers: {missingFields.join(", ")}</p>
+      )}
 
       {/* Show the backend's summary only once results are available. */}
       {results && <p>Total Records: {results.summary.total_records}</p>}
