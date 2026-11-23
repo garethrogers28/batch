@@ -4,8 +4,7 @@ import { useState } from "react";
 
 // A component is a function that describes part of the interface.
 function App() {
-  // State is remembered between renders. Each setter updates its value and
-  // tells React to render again; null means there is no file or result yet.
+  // State is remembered between renders and updated using its setter.
   const [selectedFile, setSelectedFile] = useState(null);
   const [results, setResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -14,43 +13,51 @@ function App() {
 
   // React calls this handler when the file input changes.
   function handleFileChange(event) {
-    // The input's files list contains the selected files; [0] gets the first.
+    // Save the first selected file and clear feedback from the previous file.
     setSelectedFile(event.target.files[0]);
     setResults(null);
     setApiError(null);
+    setMissingFields([]);
   }
 
   // async lets this handler use await while the backend responds.
   async function handleValidate() {
-    // Stop immediately if no file is selected.
+    // Clear previous errors before a new validation attempt.
+    setMissingFields([]);
     setApiError(null);
+    // Stop immediately if no file is selected.
     if (!selectedFile) return;
 
-    // set loading as true
+    // Show that validation is in progress.
     setIsLoading(true);
 
     // FormData holds the file under "file", the field expected by the backend.
     const formData = new FormData();
     formData.append("file", selectedFile);
 
-    // Send the form data to the backend and wait for its response. catch errors
+    // Send the file and handle the response or any request errors.
     try {
       const response = await fetch("http://127.0.0.1:8000/validate", {
         method: "POST",
         body: formData,
       });
+      // Throw an error for an unsuccessful HTTP response.
       if (!response.ok) throw new Error("Request Failed");
 
+      // Read the JSON response into a JavaScript value.
       const data = await response.json();
+      // Save missing headers separately instead of treating them as results.
       if (data.valid === false) {
-        console.log(data.missing_fields);
         setMissingFields(data.missing_fields);
-        throw new Error();
+        return;
       }
+      // Save the validation results for display.
       setResults(data);
     } catch (error) {
+      // Store request or response errors for the UI.
       setApiError(error);
     } finally {
+      // Stop loading whether the request succeeded or failed.
       setIsLoading(false);
     }
   }
@@ -79,13 +86,13 @@ function App() {
         Validate file
       </button>
 
-      {/*add error message*/}
-      {apiError && <p>Validation failed. Please try again</p>}
-
-      {/* added loading state*/}
+      {/* Show a message while validation is in progress. */}
       {isLoading && <p>Validating...</p>}
 
-      {/*display missing headers*/}
+      {/* Show a friendly message if the request fails. */}
+      {apiError && <p>Validation failed. Please try again</p>}
+
+      {/* Show missing headers as a comma-separated list. */}
       {missingFields.length > 0 && (
         <p>Missing Headers: {missingFields.join(", ")}</p>
       )}
