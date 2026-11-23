@@ -9,12 +9,14 @@ function App() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [results, setResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState(null);
 
   // React calls this handler when the file input changes.
   function handleFileChange(event) {
     // The input's files list contains the selected files; [0] gets the first.
     setSelectedFile(event.target.files[0]);
     setResults(null);
+    setApiError(null);
   }
 
   // async lets this handler use await while the backend responds.
@@ -38,7 +40,8 @@ function App() {
       const data = await response.json();
       setResults(data);
     } catch (error) {
-      console.log("Error message....", error);
+      setApiError(error);
+      console.log(error);
     } finally {
       setIsLoading(false);
     }
@@ -67,6 +70,9 @@ function App() {
       <button disabled={!selectedFile} onClick={handleValidate} type="button">
         Validate file
       </button>
+
+      {/*add error message*/}
+      {apiError && <p>Validation failed. Please try again</p>}
 
       {/* added loading state*/}
       {isLoading && <p>Validating...</p>}
