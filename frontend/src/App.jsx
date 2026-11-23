@@ -23,6 +23,7 @@ function App() {
   // async lets this handler use await while the backend responds.
   async function handleValidate() {
     // Clear previous errors before a new validation attempt.
+    setResults(null);
     setMissingFields([]);
     setApiError(null);
     // Stop immediately if no file is selected.
@@ -72,6 +73,7 @@ function App() {
       <label htmlFor="csv-file">Choose a CSV file</label>
       {/* The input suggests CSV files and calls the handler when it changes. */}
       <input
+        disabled={isLoading}
         id="csv-file"
         type="file"
         accept=".csv"
@@ -82,7 +84,11 @@ function App() {
       {selectedFile && <p>{selectedFile.name}</p>}
 
       {/* ! means "not": disable the button when no file is selected. */}
-      <button disabled={!selectedFile} onClick={handleValidate} type="button">
+      <button
+        disabled={!selectedFile || isLoading}
+        onClick={handleValidate}
+        type="button"
+      >
         Validate file
       </button>
 
