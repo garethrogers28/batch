@@ -29,17 +29,19 @@ function App() {
     const formData = new FormData();
     formData.append("file", selectedFile);
 
-    // Send the form data to the backend and wait for its response.
-    const response = await fetch("http://127.0.0.1:8000/validate", {
-      method: "POST",
-      body: formData,
-    });
-
-    // Read the JSON response into a JavaScript value, then save it in state
-    // so the next render can display the results.
-    const data = await response.json();
-    setResults(data);
-    setIsLoading(false);
+    // Send the form data to the backend and wait for its response. catch errors
+    try {
+      const response = await fetch("http://127.0.0.1:8000/validate", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      setResults(data);
+    } catch (error) {
+      console.log("Error message....", error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   // JSX describes what React should display. Curly braces embed JavaScript.
