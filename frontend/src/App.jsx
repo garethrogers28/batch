@@ -22,6 +22,7 @@ function App() {
   // async lets this handler use await while the backend responds.
   async function handleValidate() {
     // Stop immediately if no file is selected.
+    setApiError(null);
     if (!selectedFile) return;
 
     // set loading as true
@@ -37,11 +38,12 @@ function App() {
         method: "POST",
         body: formData,
       });
+      if (!response.ok) throw new Error("Request Failed");
+
       const data = await response.json();
       setResults(data);
     } catch (error) {
       setApiError(error);
-      console.log(error);
     } finally {
       setIsLoading(false);
     }
