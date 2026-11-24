@@ -63,6 +63,10 @@ function App() {
     }
   }
 
+  function handleSubmitBatch() {
+    return;
+  }
+
   // JSX describes what React should display. Curly braces embed JavaScript.
   return (
     <main>
@@ -99,6 +103,7 @@ function App() {
           results.summary.total_records === 0 ||
           !selectedFile
         }
+        onClick={handleSubmitBatch}
         type="button"
       >
         Submit Batch
