@@ -1,7 +1,14 @@
-from fastapi import FastAPI, UploadFile, File
-import csv, io
+import csv
+import io
+
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from backend.pydantic_bank_validation import validate_csv, validate_records, get_batch_summary
+
+from backend.pydantic_bank_validation import (
+    get_batch_summary,
+    validate_csv,
+    validate_records,
+)
 
 app = FastAPI()
 
@@ -16,8 +23,7 @@ app.add_middleware(
 def read_root():
     return {"message": "Are you running?"}
 
-@app.post("/validate")
-async def validate_file(file: UploadFile = File(...)):
+async def validate_helper(file: UploadFile = File(...)):
     file_bytes = await file.read()
     file_text = file_bytes.decode("utf-8-sig")
     reader = csv.DictReader(io.StringIO(file_text))
@@ -31,3 +37,14 @@ async def validate_file(file: UploadFile = File(...)):
                 "summary": preflight_summary,
                 "validation": record_validation,
 }
+
+@app.post("/validate")
+async def validate_file(file: UploadFile = File(...)):
+    return await validate_helper(file)
+    
+
+
+@app.post("/submit-batch")
+async def submit_batch(file: UploadFile = File(...)):
+    await validate_helper(file)
+    

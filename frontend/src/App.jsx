@@ -84,9 +84,6 @@ function App() {
         onChange={handleFileChange}
       />
 
-      {/* && renders the paragraph only when a file has been selected. */}
-      {selectedFile && <p>{selectedFile.name}</p>}
-
       {/* ! means "not": disable the button when no file is selected. */}
       <button
         disabled={!selectedFile || isLoading}
@@ -108,6 +105,9 @@ function App() {
       >
         Submit Batch
       </button>
+
+      {/* && renders the paragraph only when a file has been selected. */}
+      {selectedFile && <p>File Selected: {selectedFile.name}</p>}
 
       {/* Show a message while validation is in progress. */}
       {isLoading && <p>Validating...</p>}
