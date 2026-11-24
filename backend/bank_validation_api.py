@@ -1,13 +1,14 @@
 import csv
 import io
 
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.pydantic_bank_validation import (
     get_batch_summary,
     validate_csv,
     validate_records,
+    HeaderValidationResult
 )
 
 app = FastAPI()
@@ -46,5 +47,13 @@ async def validate_file(file: UploadFile = File(...)):
 
 @app.post("/submit-batch")
 async def submit_batch(file: UploadFile = File(...)):
-    await validate_helper(file)
-    
+    validation_result = await validate_helper(file)
+    if isinstance(validation_result, HeaderValidationResult):
+        return validation_result
+    if validation_result["summary"].failed_records > 0:
+        return validation_result
+    if validation_result["summary"].total_records == 0:
+        raise HTTPException(400, detail="Batch File contains no records")
+    return validation_result
+   
+
