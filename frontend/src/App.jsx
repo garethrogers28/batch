@@ -92,6 +92,18 @@ function App() {
         Validate file
       </button>
 
+      <button
+        disabled={
+          !results ||
+          !results.summary.batch_result ||
+          results.summary.total_records === 0 ||
+          !selectedFile
+        }
+        type="button"
+      >
+        Submit Batch
+      </button>
+
       {/* Show a message while validation is in progress. */}
       {isLoading && <p>Validating...</p>}
 
