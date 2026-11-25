@@ -49,9 +49,19 @@ async def validate_file(file: UploadFile = File(...)):
 async def submit_batch(file: UploadFile = File(...)):
     validation_result = await validate_helper(file)
     if isinstance(validation_result, HeaderValidationResult):
-        return validation_result
+        raise HTTPException(
+            400,
+            detail={
+                "missing_fields": list(validation_result.missing_fields),
+                "message": "File has incorrect headers",
+            },
+        )
     if validation_result["summary"].failed_records > 0:
-        return validation_result
+        raise HTTPException(400, detail={
+            "message": "File contains failed records",
+            "failed_records": validation_result["summary"].failed_records,
+            "failed_rows": [error.model_dump() for error in validation_result["validation"].errors]
+            })
     if validation_result["summary"].total_records == 0:
         raise HTTPException(400, detail="Batch File contains no records")
     return validation_result
